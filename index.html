@@ -9,30 +9,54 @@
   }
   </style>
   <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-  <script src="http://localhost:8080/main.js"></script>
+  <script src="http://localhost:8080/main.js?s"></script>
 </head>
+
 <body>
   <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <g stroke="green" fill="white" stroke-width="3">
-      <!-- <circle cx="45" cy="70" r="15" /> -->
-      <!-- <circle cx="60" cy="75" r="15" /> -->
-      <!-- <circle cx="75" cy="70" r="15" /> -->
-      <!-- <circle cx="90" cy="75" r="15" /> -->
-    </g>
+    <g stroke-width="3"></g>
   </svg>
   X: <span id="x"></span>
   Y: <span id="y"></span>
 
   <script>
+
   var g = document.querySelector('g');
-  var circle = createSvgElement('circle', { cx: 45, cy: 70, r: 15 });
-  g.appendChild(circle);
+
+  var circles = createRange(25, 1, 200).map(function(x) {
+    return createRange(30, 10, 10).map(function(y) {
+      return createSvgElement('circle', {
+        cx: x,
+        cy: y,
+        r: 15,
+        stroke: randomColor(),
+        fill: randomColor()
+      });
+    });
+  });
+
+  circles = [].concat.apply([], circles);
+
+  document.addEventListener('DOMContentLoaded', function(event) {
+
+    circles.each(function(circle, index) {
+      g.appendChild(circle);
+    });
+
+  });
 
   var svg = document.querySelector('svg');
+
   svg.addEventListener('mousemove', function(event) {
     var loc = svgLoc(svg, event.clientX, event.clientY);
-    jostle(circle, loc);
+
+    circles.each(function(circle) {
+      if (circle.collidesWith(loc))
+        circle.jostle(2);
+        // circle.repel(2);
+    });
   });
+
   </script>
 </body>
 </html>
